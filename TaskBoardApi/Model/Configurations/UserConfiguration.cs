@@ -30,8 +30,6 @@ namespace TaskBoardApi.Model.Configurations
                 .WithOne(t => t.User)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
         }
     }
 }
