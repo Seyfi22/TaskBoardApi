@@ -19,7 +19,7 @@ namespace TaskBoardApi.Model.Configurations
             entity.HasIndex(u => u.Email).IsUnique();
 
             entity.Property(u => u.PasswordHash)
-                .IsRequired()   
+                .IsRequired()  
                 .HasMaxLength(100);
 
             entity.Property(u => u.Role)
