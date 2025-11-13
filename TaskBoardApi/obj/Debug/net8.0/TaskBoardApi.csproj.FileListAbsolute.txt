@@ -170,3 +170,8 @@ C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\obj\Debug\
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\obj\Debug\net8.0\TaskBoardApi.pdb
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\obj\Debug\net8.0\TaskBoardApi.genruntimeconfig.cache
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\obj\Debug\net8.0\ref\TaskBoardApi.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
