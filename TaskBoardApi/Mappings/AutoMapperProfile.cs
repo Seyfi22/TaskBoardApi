@@ -39,7 +39,6 @@ namespace TaskBoardApi.Mappings
             // while updating the task
             CreateMap<UpdateTaskDto, TaskItem>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
         }
     }
 }

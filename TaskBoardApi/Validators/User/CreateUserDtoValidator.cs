@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using TaskBoardApi.Data;
 using TaskBoardApi.DTOs.User;
 using TaskBoardApi.Model.Enums;
@@ -18,7 +19,7 @@ namespace TaskBoardApi.Validators.User
                 .EmailAddress().WithMessage("Invalid email format.")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters")
                 .Must(e => !context.Users.Any(u => u.Email == e))
-                    .WithMessage("This email has already been registered"); ;
+                    .WithMessage("This email has already been registered"); 
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required.")
