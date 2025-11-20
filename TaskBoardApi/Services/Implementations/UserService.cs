@@ -11,7 +11,12 @@ namespace TaskBoardApi.Services.Implementations
 {
     public class UserService : GenericService<UserDto, User>, IUserService
     {
-        public UserService(TaskBoardDbContext context, IMapper mapper) : base(context, mapper) { }
+        private readonly ILogger<UserService> _logger;
+
+        public UserService(TaskBoardDbContext context, IMapper mapper, ILogger<UserService> logger) : base(context, mapper) 
+        {
+            _logger = logger;
+        }
 
         public override async Task<List<UserDto>> GetAllAsync()
         {
@@ -23,6 +28,8 @@ namespace TaskBoardApi.Services.Implementations
 
         public override async Task<UserDto> GetByIdAsync(int id)
         {
+            _logger.LogInformation("Getting user by id {id}", id);
+
             var user = await _context.Users
                 .Include(u => u.Tasks)
                 .FirstOrDefaultAsync(u => u.Id == id);
@@ -32,6 +39,8 @@ namespace TaskBoardApi.Services.Implementations
                 throw new NotFoundException($"User with id {id} not found.");
             }
 
+            _logger.LogInformation("User with id {id} retrieved successfully", id);
+
             return _mapper.Map<UserDto>(user);
         }
 
@@ -39,13 +48,17 @@ namespace TaskBoardApi.Services.Implementations
         {
             if(createUserDto == null)
             {
+                _logger.LogWarning("CreateUserDto is null");
                 throw new BadRequestException("User data cannot be null.");
             }
+
+            _logger.LogInformation("Creating user with email {email}", createUserDto.Email);
 
             var emailExist = await _context.Users.AnyAsync(u => u.Email == createUserDto.Email);
 
             if(emailExist)
             {
+                _logger.LogWarning("User creation failed. Email {email} already exists", createUserDto.Email);
                 throw new BadRequestException("Email is already registered.");
             }
 
@@ -61,13 +74,18 @@ namespace TaskBoardApi.Services.Implementations
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
+            _logger.LogInformation("User created successfully with id {id}", user.Id);
+
             return _mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> UpdateAsync(int id, UpdateUserDto updateUserDto)
         {
+            _logger.LogInformation("Updating user with id {id}", id);
+
             if (updateUserDto == null)
             {
+                _logger.LogWarning("UpdateUserDto is null for id {id}", id);
                 throw new BadRequestException("Update data cannot be null.");
             }
 
@@ -84,6 +102,7 @@ namespace TaskBoardApi.Services.Implementations
             {
                 if(await IsEmailRegisteredByAnotherAccountAsync(id, updateUserDto.Email))
                 {
+                    _logger.LogWarning("User {id} update failed. Email belongs to another account", id);
                     throw new BadRequestException("This email belongs to another user.");
                 }
             }
@@ -91,6 +110,8 @@ namespace TaskBoardApi.Services.Implementations
             _mapper.Map(updateUserDto, user);
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("User with id {id} updated successfully", id);
 
             return _mapper.Map<UserDto>(user);
 

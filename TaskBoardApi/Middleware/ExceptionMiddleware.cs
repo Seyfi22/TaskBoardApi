@@ -9,11 +9,13 @@ namespace TaskBoardApi.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next, IWebHostEnvironment env)
+        public ExceptionMiddleware(RequestDelegate next, IWebHostEnvironment env, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
             _env = env;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -24,6 +26,7 @@ namespace TaskBoardApi.Middlewares
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An unhandled error occurred.");
                 await HandleExceptionAsync(context, ex);
             }
         }
