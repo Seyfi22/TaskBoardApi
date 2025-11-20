@@ -23,16 +23,11 @@ namespace TaskBoardApi.Controllers
             return Ok(tasks);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetTaskById")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var task = await _taskService.GetByIdAsync(id);
-            
-            if(task == null)
-            {
-                return NotFound($"Task with id {id} not found.");
-            }
-
+           
             return Ok(task);
         }
 
@@ -46,12 +41,7 @@ namespace TaskBoardApi.Controllers
 
             var result = await _taskService.CreateAsync(createTaskDto);
 
-            if (result == null)
-            {
-                return BadRequest("Task cannot be created.");
-            }
-
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
+            return CreatedAtRoute("GetTaskById", new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
@@ -61,33 +51,16 @@ namespace TaskBoardApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+            
+            var updatedTask = await _taskService.UpdateAsync(id, updateTaskDto);
 
-            try
-            {
-                var updatedTask = await _taskService.UpdateAsync(id, updateTaskDto);
-
-                if (updatedTask == null)
-                {
-                    return NotFound($"Task with id {id} not found.");
-                }
-
-                return Ok(updatedTask);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(updatedTask);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var deletedTask = await _taskService.DeleteAsync(id);
-
-            if (!deletedTask)
-            {
-                return NotFound($"Task with id {id} not found.");
-            }
+            await _taskService.DeleteAsync(id);
 
             return NoContent();
         }

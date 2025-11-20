@@ -9,6 +9,7 @@ namespace TaskBoardApi.Validators.User
         public UpdateUserDtoValidator()
         {
             RuleFor(u => u.Fullname)
+                .NotEmpty().WithMessage("Full name is required.")
                 .MaximumLength(100).WithMessage("Full name must not exceed 100 characters.")
                 .When(u => u.Fullname != null);
 

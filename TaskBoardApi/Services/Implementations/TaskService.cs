@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TaskBoardApi.Data;
 using TaskBoardApi.DTOs.Task;
+using TaskBoardApi.Exceptions;
 using TaskBoardApi.Model.Entities;
 using TaskBoardApi.Services.Interfaces;
 
@@ -28,7 +29,7 @@ namespace TaskBoardApi.Services.Implementations
 
             if(task == null)
             {
-                return null;
+                throw new NotFoundException($"Task with id {id} not found.");
             }
 
             return _mapper.Map<TaskDto>(task);
@@ -38,14 +39,14 @@ namespace TaskBoardApi.Services.Implementations
         {
             if(createTaskDto == null)
             {
-                return null;
+                throw new BadRequestException("Task data cannot be null.");
             }
 
             var userExists = await _context.Users.AnyAsync(u => u.Id == createTaskDto.UserId);
 
             if(!userExists)
             {
-                throw new Exception("Cannot create task. User with the given ID does not exist.");
+                throw new BadRequestException("Cannot create task. Provided UserId does not exist.");
             }
 
             var task = _mapper.Map<TaskItem>(createTaskDto);
@@ -60,7 +61,7 @@ namespace TaskBoardApi.Services.Implementations
         {
             if(updateTaskDto == null)
             {
-                return null;
+                throw new BadRequestException("Update data cannot be null.");
             }
 
             var task = await _context.Tasks
@@ -69,7 +70,7 @@ namespace TaskBoardApi.Services.Implementations
 
             if(task == null)
             {
-                return null;
+                throw new NotFoundException($"Task with id {id} not found.");
             }
 
             if (updateTaskDto.UserId.HasValue)
@@ -78,7 +79,7 @@ namespace TaskBoardApi.Services.Implementations
                     .AnyAsync(u => u.Id == updateTaskDto.UserId.Value);
 
                 if (!userExists)
-                    throw new Exception("Cannot update task. Provided UserId does not exist.");
+                    throw new BadRequestException("Cannot update task. Provided UserId does not exist.");
             }
 
             _mapper.Map(updateTaskDto, task);

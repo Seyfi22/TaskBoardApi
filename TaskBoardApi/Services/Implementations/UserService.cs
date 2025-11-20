@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TaskBoardApi.Data;
 using TaskBoardApi.DTOs.User;
+using TaskBoardApi.Exceptions;
 using TaskBoardApi.Model.Entities;
 using TaskBoardApi.Services.Interfaces;
 
@@ -28,7 +29,7 @@ namespace TaskBoardApi.Services.Implementations
 
             if(user == null)
             {
-                return null;
+                throw new NotFoundException($"User with id {id} not found.");
             }
 
             return _mapper.Map<UserDto>(user);
@@ -38,14 +39,14 @@ namespace TaskBoardApi.Services.Implementations
         {
             if(createUserDto == null)
             {
-                return null;
+                throw new BadRequestException("User data cannot be null.");
             }
 
             var emailExist = await _context.Users.AnyAsync(u => u.Email == createUserDto.Email);
 
             if(emailExist)
             {
-                return null;
+                throw new BadRequestException("Email is already registered.");
             }
 
             var user = _mapper.Map<User>(createUserDto);
@@ -67,7 +68,7 @@ namespace TaskBoardApi.Services.Implementations
         {
             if (updateUserDto == null)
             {
-                return null;
+                throw new BadRequestException("Update data cannot be null.");
             }
 
             var user = await _context.Users
@@ -76,14 +77,14 @@ namespace TaskBoardApi.Services.Implementations
 
             if (user == null)
             {
-                return null;
+                throw new NotFoundException($"User with id {id} not found.");
             }
 
             if(updateUserDto.Email != null)
             {
                 if(await IsEmailRegisteredByAnotherAccountAsync(id, updateUserDto.Email))
                 {
-                    throw new Exception("This email belongs to another user.");
+                    throw new BadRequestException("This email belongs to another user.");
                 }
             }
 

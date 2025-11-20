@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TaskBoardApi.Data;
+using TaskBoardApi.Exceptions;
 using TaskBoardApi.Services.Interfaces;
 
 namespace TaskBoardApi.Services.Implementations
@@ -20,7 +21,6 @@ namespace TaskBoardApi.Services.Implementations
             _dbSet = context.Set<TEntity>();
         }
 
-
         public virtual async Task<List<TDto>> GetAllAsync()
         {
             return await _dbSet
@@ -34,7 +34,7 @@ namespace TaskBoardApi.Services.Implementations
 
             if(entity == null)
             {
-                return default;
+                throw new NotFoundException($"{typeof(TEntity).Name} with id {id} not found.");
             }
 
             return _mapper.Map<TDto>(entity);
@@ -46,7 +46,7 @@ namespace TaskBoardApi.Services.Implementations
 
             if(entity == null)
             {
-                return false;
+                throw new NotFoundException($"{typeof(TEntity).Name} with id {id} not found.");
             }
 
             _dbSet.Remove(entity);

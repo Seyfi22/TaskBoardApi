@@ -23,14 +23,10 @@ namespace TaskBoardApi.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetUserById")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var user = await _userService.GetByIdAsync(id);
-            if(user == null)
-            {
-                return NotFound($"User with id {id} not found.");
-            }
 
             return Ok(user);
         }
@@ -43,14 +39,9 @@ namespace TaskBoardApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await _userService.CreateAsync(createUserDto);
-            
-            if(result == null)
-            {
-                return BadRequest("User cannot be created.");
-            }
+            var result = await _userService.CreateAsync(createUserDto);       
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
+            return CreatedAtRoute("GetUserById", new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
@@ -60,31 +51,16 @@ namespace TaskBoardApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+            
+            var updatedUser = await _userService.UpdateAsync(id, updateUserDto);
 
-            try
-            {
-                var updatedUser = await _userService.UpdateAsync(id, updateUserDto);
-
-                if(updatedUser == null)
-                {
-                    return NotFound($"User with id {id} not found.");
-                }
-
-                return Ok(updatedUser);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(updatedUser);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var deletedUser = await _userService.DeleteAsync(id);
-
-            if (!deletedUser)
-                return NotFound($"User with id {id} not found.");
+            await _userService.DeleteAsync(id);
 
             return NoContent();
         }
