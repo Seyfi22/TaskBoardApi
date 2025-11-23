@@ -1,0 +1,7 @@
+﻿namespace TaskBoardApi.Services.Interfaces.Jwt
+{
+    public interface ITokenService
+    {
+        string CreateToken(int userId, string email, string role);
+    }
+}

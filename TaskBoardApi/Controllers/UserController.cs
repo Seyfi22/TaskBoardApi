@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoardApi.DTOs.User;
 using TaskBoardApi.Services.Interfaces;
@@ -17,6 +19,7 @@ namespace TaskBoardApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAsync()
         {
             var users = await _userService.GetAllAsync();
@@ -24,14 +27,31 @@ namespace TaskBoardApi.Controllers
         }
 
         [HttpGet("{id}", Name = "GetUserById")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User info not found in token.");
+            }
+
+            var currentUserId = int.Parse(userIdClaim);
+
+            if (role != "Admin" && currentUserId != id)
+            {
+                return Forbid("You are not allowed to see other users' profiles.");
+            }
+
             var user = await _userService.GetByIdAsync(id);
 
             return Ok(user);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto createUserDto)
         {
             if (!ModelState.IsValid)
@@ -45,6 +65,7 @@ namespace TaskBoardApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateUserDto updateUserDto)
         {
             if (!ModelState.IsValid)
@@ -58,6 +79,7 @@ namespace TaskBoardApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             await _userService.DeleteAsync(id);

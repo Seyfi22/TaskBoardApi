@@ -71,6 +71,8 @@ namespace TaskBoardApi.Services.Implementations
                     .ToList();
             }
 
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
