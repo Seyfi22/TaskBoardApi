@@ -49,6 +49,16 @@ namespace TaskBoardApi.Middlewares
                     error.Message = ex.Message;
                     break;
 
+                case ForbiddenException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    error.Message = ex.Message;
+                    break;
+
+                case UnauthorizedException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    error.Message = ex.Message;
+                    break;
+
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     error.Message = "An unexpected error occurred.";

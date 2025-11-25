@@ -175,3 +175,6 @@ C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.dll
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
 C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\LENOVO\source\repos\Projects(Guya)\TaskBoardApi\TaskBoardApi\bin\Debug\net8.0\BouncyCastle.Crypto.dll

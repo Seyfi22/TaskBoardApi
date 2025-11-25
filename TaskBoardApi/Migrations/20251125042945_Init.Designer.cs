@@ -12,7 +12,7 @@ using TaskBoardApi.Data;
 namespace TaskBoardApi.Migrations
 {
     [DbContext(typeof(TaskBoardDbContext))]
-    [Migration("20251110103110_Init")]
+    [Migration("20251125042945_Init")]
     partial class Init
     {
         /// <inheritdoc />

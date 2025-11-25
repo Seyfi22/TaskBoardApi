@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoardApi.DTOs.Task;
+using TaskBoardApi.Exceptions;
 using TaskBoardApi.Services.Interfaces;
 
 namespace TaskBoardApi.Controllers
@@ -22,8 +22,22 @@ namespace TaskBoardApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllAsync()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userIdClaim == null)
+                throw new UnauthorizedException("User info not found.");
+
+            int currentUserId = int.Parse(userIdClaim);
+
             var tasks = await _taskService.GetAllAsync();
-            return Ok(tasks);
+
+            if (role == "Admin")
+                return Ok(tasks);
+
+            var userTasks = tasks.Where(t => t.User == currentUserId);
+
+            return Ok(userTasks);
         }
 
         [HttpGet("{id}", Name = "GetTaskById")]
@@ -34,30 +48,20 @@ namespace TaskBoardApi.Controllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (userIdClaim == null)
-            {
-                return Unauthorized("User info not found in token.");
-            }
+                throw new UnauthorizedException("User info not found.");
 
             var currentUserId = int.Parse(userIdClaim);
 
-            // Task-ı DB-dən oxuyuruq
             var task = await _taskService.GetByIdAsync(id);
 
-            // Task tapılmadısa
             if (task == null)
-            {
-                return NotFound($"Task with id {id} not found.");
-            }
+                throw new NotFoundException($"Task with id {id} not found.");
 
-            // Əgər admin deyilsə və task başqa user-ə aiddirsə → Forbid
             if (role != "Admin" && task.User != currentUserId)
-            {
-                return Forbid("You are not allowed to access this task.");
-            }
+                throw new ForbiddenException("You are not allowed to access this task.");
 
             return Ok(task);
         }
-
 
         [HttpPost]
         [Authorize]
@@ -70,13 +74,12 @@ namespace TaskBoardApi.Controllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (userIdClaim == null)
-                return Unauthorized("User info not found.");
+                throw new UnauthorizedException("User info not found.");
 
             int currentUserId = int.Parse(userIdClaim);
 
-            // User yalnız özünə aid task yarada bilər
             if (role != "Admin" && createTaskDto.UserId != currentUserId)
-                return Forbid("You cannot create tasks for another user.");
+                throw new ForbiddenException("You cannot create a task for another user.");
 
             var result = await _taskService.CreateAsync(createTaskDto);
 
@@ -94,21 +97,19 @@ namespace TaskBoardApi.Controllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (userIdClaim == null)
-                return Unauthorized("User info not found.");
+                throw new UnauthorizedException("User info not found.");
 
             int currentUserId = int.Parse(userIdClaim);
 
             var task = await _taskService.GetByIdAsync(id);
             if (task == null)
-                return NotFound($"Task with id {id} not found.");
+                throw new NotFoundException($"Task with id {id} not found.");
 
-            // User yalnız öz taskını update edə bilər
             if (role != "Admin" && task.User != currentUserId)
-                return Forbid("You cannot update this task.");
+                throw new ForbiddenException("You cannot update this task.");
 
-            // User yalnız özünə aid etmək üçün dəyişə bilər (başqa userə köçürə bilməz)
             if (role != "Admin" && updateTaskDto.UserId.HasValue && updateTaskDto.UserId != currentUserId)
-                return Forbid("You cannot transfer this task to another user.");
+                throw new ForbiddenException("You cannot transfer this task to another user.");
 
             var updatedTask = await _taskService.UpdateAsync(id, updateTaskDto);
 
@@ -120,7 +121,6 @@ namespace TaskBoardApi.Controllers
         public async Task<IActionResult> DeleteAsync(int id)
         {
             await _taskService.DeleteAsync(id);
-
             return NoContent();
         }
     }

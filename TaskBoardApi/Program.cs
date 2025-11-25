@@ -14,6 +14,7 @@ using TaskBoardApi.Services.Interfaces.Jwt;
 using TaskBoardApi.Validators.Task;
 using TaskBoardApi.Validators.User;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -30,6 +31,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskDtoValidator>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAuthentication(options =>

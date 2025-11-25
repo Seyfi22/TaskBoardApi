@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TaskBoardApi.DTOs.Auth;
-using TaskBoardApi.Services.Interfaces.Jwt;
-using TaskBoardApi.Data;
 using Microsoft.EntityFrameworkCore;
+using TaskBoardApi.Data;
+using TaskBoardApi.DTOs.Auth;
 using TaskBoardApi.Exceptions;
+using TaskBoardApi.Services.Interfaces;
+using TaskBoardApi.Services.Interfaces.Jwt;
 
 namespace TaskBoardApi.Controllers
 {
@@ -11,28 +12,17 @@ namespace TaskBoardApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly TaskBoardDbContext _context;
-        private readonly ITokenService _tokenService;
+        private readonly IAuthService _authService;
 
-        public AuthController(TaskBoardDbContext context, ITokenService tokenService)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
-            _tokenService = tokenService;
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-
-            if (user == null)
-                throw new NotFoundException("User not found.");
-
-            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
-                throw new BadRequestException("Password is incorrect.");
-
-            var token = _tokenService.CreateToken(user.Id, user.Email, user.Role.ToString());
+            var token = await _authService.LoginAsync(loginDto);
 
             return Ok(new
             {
