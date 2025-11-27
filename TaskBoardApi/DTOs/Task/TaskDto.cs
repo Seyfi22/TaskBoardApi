@@ -8,6 +8,6 @@
         public DateTime Deadline { get; set; }
         public bool IsCompleted { get; set; }
 
-        public int User { get; set; }
+        public int UserId { get; set; }
     }
 }

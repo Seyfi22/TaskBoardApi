@@ -30,8 +30,7 @@ namespace TaskBoardApi.Mappings
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // while getting task(s)
-            CreateMap<TaskItem, TaskDto>()
-                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.UserId));
+            CreateMap<TaskItem, TaskDto>();
 
             // while posting a new task
             CreateMap<CreateTaskDto, TaskItem>();

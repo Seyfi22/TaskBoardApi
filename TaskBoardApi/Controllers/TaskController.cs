@@ -35,7 +35,7 @@ namespace TaskBoardApi.Controllers
             if (role == "Admin")
                 return Ok(tasks);
 
-            var userTasks = tasks.Where(t => t.User == currentUserId);
+            var userTasks = tasks.Where(t => t.UserId == currentUserId);
 
             return Ok(userTasks);
         }
@@ -57,7 +57,7 @@ namespace TaskBoardApi.Controllers
             if (task == null)
                 throw new NotFoundException($"Task with id {id} not found.");
 
-            if (role != "Admin" && task.User != currentUserId)
+            if (role != "Admin" && task.UserId != currentUserId)
                 throw new ForbiddenException("You are not allowed to access this task.");
 
             return Ok(task);
@@ -102,10 +102,11 @@ namespace TaskBoardApi.Controllers
             int currentUserId = int.Parse(userIdClaim);
 
             var task = await _taskService.GetByIdAsync(id);
+
             if (task == null)
                 throw new NotFoundException($"Task with id {id} not found.");
 
-            if (role != "Admin" && task.User != currentUserId)
+            if (role != "Admin" && task.UserId != currentUserId)
                 throw new ForbiddenException("You cannot update this task.");
 
             if (role != "Admin" && updateTaskDto.UserId.HasValue && updateTaskDto.UserId != currentUserId)
